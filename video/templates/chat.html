@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'chat.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>ADVANCE PUBLIC CHATROOM USING DJANGO AND DJANGO CHANNELS</h1>
+       <div class="chatroom">
+        
+       </div>
+       <div class="message_input">
+           <input type="text" class="send">
+           <button id="send_message">Send</button>
+       </div>
+    </div>
+    <script>
+    const roomname = '{{roomname}}'
+    console.log(roomname)
+     const ws = new WebSocket('ws://127.0.0.1:8000/ws/')
+     ws.onopen = () =>{
+         ws.send(JSON.stringify({
+            'command':"open",
+            'group':roomname
+         }))
+         console.log("opened")
+     }
+     const message_inp = document.querySelector("input")
+     const button = document.querySelector('button')
+     button.onclick = () =>{
+       let message = message_inp.value
+       ws.send(JSON.stringify({
+           'command':'send',
+           'message':message,
+           'group':roomname
+       }))
+     }
+     ws.onmessage = (e) =>{
+        const data= JSON.parse(e.data)
+        console.log(data)
+        const html = `<div class="chat">
+            <h5>Anonymous</h5>
+            <h5>${data.message}</h5>
+        </div>`
+        const chatroom = document.querySelector(".chatroom")
+        console.log(chatroom)
+        chatroom.innerHTML += html
+     }
+    </script>
+</body>
+</html>

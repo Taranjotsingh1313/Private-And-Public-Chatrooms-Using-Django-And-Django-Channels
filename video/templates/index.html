@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>ADVANCE PUBLIC CHATROOM USING DJANGO AND DJANGO CHANNELS</h1>
+        <div class="create_chat_info">
+           <div class="chatroom">
+            <input type="text" id="room_name" placeholder="Room Name">
+            <select id="">
+                <option value="All">Free To All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+           </div>
+           <button>Create</button>
+        </div>
+        <div class="join_chatroom">
+        <input type="text" id="join_room">
+        {% csrf_token %}
+        <button id="join_button">Join Button</button>
+        </div>
+    </div>
+    <script>
+        let create_button = document.querySelector("button")
+        let users = document.querySelector("select")
+        let room_name = document.getElementById("room_name")
+        console.log(room_name)
+        let join_button = document.getElementById("join_button")
+        console.log(join_button)
+        let join_room  = document.getElementById("join_room")
+        let csrf = document.getElementsByName("csrfmiddlewaretoken")[0].value
+
+        create_button.onclick = () =>{
+            room_name = room_name.value
+            users = users.value
+            let form = new FormData()
+            form.append('room',room_name)
+            form.append('users',users)
+            form.append('command','create')
+            form.append('csrfmiddlewaretoken',csrf)
+            fetch('/',{
+                method:'POST',
+                body:form
+            }).then(data =>{
+                return data.json()
+            }).then(Response =>{
+                command = Response['command']
+                if(command == 'exist'){
+                    const h1 = document.querySelector("h1");
+                    h1.innerHTML = 'EXIST'
+                }
+                else{
+                    window.location.href = 'http://127.0.0.1:8000/chat/' + room_name;
+                
+            }})
+        }
+        join_button.onclick = () =>{
+            room = join_room.value
+            console.log(room)
+            let form = new FormData()
+            form.append('room',room)
+            form.append('command','join')
+            form.append('csrfmiddlewaretoken',csrf)
+            fetch('/',{
+                method:'POST',
+                body:form
+            }).then(data =>{
+                return data.json()
+            }).then(response =>{
+                let command = response.command
+                if(command == 'full'){
+                    const h1 = document.querySelector("h1");
+                    h1.innerHTML = 'Full Hai Bhai'
+                }
+                else{
+                    window.location.href = 'http://127.0.0.1:8000/chat/' + room;
+                }
+            })
+        }
+        // join_button.onclick =() =>{  
+        //     room_name = room_name.value
+        //     let form = new FormData()
+        //     form.append('room',room_name)
+        //     form.append('command','join')
+        //     form.append('csrfmiddlewaretoken',csrf)
+        //     fetch('/',{
+        //         method:'POST',
+        //         body:form
+        //     }).then(data =>{
+        //         print(data)
+        //         return data.json()
+        //     }).then(response =>{
+        //         console.log(response)
+        //     }).catch(err =>{
+        //         console.log(err)
+        //     })
+        // }
+
+        // create_button.onclick = () =>{
+        //     room = room_name.value
+        //     allowed_users = users.value
+        //     let form = new FormData()
+        //     form.append("room_name",room)
+        //     form.append("command",'create')
+        //     form.append("users",allowed_users)
+        //     form.append("csrfmiddlewaretoken",csrf)
+        //     fetch("/",{
+        //         method:'POST',
+        //         body:form
+        //     }).then(data =>{
+        //         return data.json()
+        //     }).then(response =>{
+        //         console.log(response)
+        //     })
+        // }
+        // join_button.onclick = () =>{
+        //     room = join_room.value
+        //     let form = new FormData()
+        //     form.append("room_name",room)
+        //     form.append("command",'join')
+        //     form.append("csrfmiddlewaretoken",csrf)
+        //     fetch("/",{
+        //         method:'POST',
+        //         body:form
+        //     }).then(data =>{
+        //         return data.json()
+        //     }).then(response =>{
+        //         console.log(response)
+        //     })
+        // }
+    </script>
+</body>
+</html>
